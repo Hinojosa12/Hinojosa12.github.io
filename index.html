@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alcide Hinojosa — Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: a production status board as the hero, then case files for each live system, read like an engineering log. */
+:root{
+  --bg:#FFFFFF;
+  --surface:#F3F6FC;
+  --ink:#05070D;
+  --muted:#4E5A70;
+  --line:#DCE3EF;
+  --accent:#1F5BFF;
+  --accent-2:#6FA0FF;
+  --live:#1F5BFF;
+  --board:#05070D;
+  --board-ink:#E6ECF8;
+  --board-muted:#7D8AA6;
+  --display:"Unbounded", "Arial Black", system-ui, sans-serif;
+  --body:"Manrope", "Segoe UI", system-ui, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#05070D; --surface:#0B111E; --ink:#F3F6FC; --muted:#8C98B2; --line:#1A2337;
+    --accent:#4C82FF; --accent-2:#9BBEFF; --live:#4C82FF; --board:#0A0F1C; --board-ink:#E6ECF8; --board-muted:#7D8AA6;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#05070D; --surface:#0B111E; --ink:#F3F6FC; --muted:#8C98B2; --line:#1A2337;
+    --accent:#4C82FF; --accent-2:#9BBEFF; --live:#4C82FF; --board:#0A0F1C; --board-ink:#E6ECF8; --board-muted:#7D8AA6;
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0}
+[id]{scroll-margin-top:76px}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+html[data-lang="en"] .es, html[data-lang="es"] .en{display:none !important}
+a{color:inherit}
+a:focus-visible, button:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.05}
+p{margin:0}
+.wrap{max-width:1120px;margin:0 auto;padding:0 clamp(16px,4vw,40px)}
+.mono{font-family:var(--mono)}
+
+/* top bar */
+.top{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;height:60px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:600}
+.mark{width:32px;height:32px;border-radius:8px;background:var(--ink);color:var(--bg);display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:14px;letter-spacing:-.02em}
+.nav{display:flex;align-items:center;gap:22px;font-size:15px}
+.nav a{text-decoration:none;color:var(--muted)}
+.nav a:hover{color:var(--ink)}
+.lang{display:flex;border:1px solid var(--line);border-radius:999px;padding:3px;background:var(--surface)}
+.lang button{all:unset;cursor:pointer;font-family:var(--mono);font-size:12px;padding:4px 10px;border-radius:999px;color:var(--muted)}
+.lang button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+@media (max-width:760px){.nav a{display:none}}
+
+/* hero */
+.hero{padding:clamp(48px,8vw,96px) 0 56px}
+.hero .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(28px,5vw,64px);align-items:center}
+@media (max-width:900px){.hero .wrap{grid-template-columns:1fr}}
+.eyebrow{font-family:var(--mono);font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 14px}
+.eyebrow b{color:var(--accent);font-weight:500}
+.hero h1{font-size:clamp(36px,5vw,66px);font-weight:800;letter-spacing:-.04em;line-height:1.08;margin:18px 0 22px}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.lede{font-size:clamp(18px,2vw,21px);color:var(--muted);max-width:34em}
+.lede strong{color:var(--ink);font-weight:500}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;border-radius:10px;text-decoration:none;font-weight:500;font-size:15px;border:1px solid var(--ink)}
+.btn.primary{background:var(--ink);color:var(--bg)}
+.btn:hover{transform:translateY(-1px)}
+@media (prefers-reduced-motion:no-preference){.btn{transition:transform .15s}}
+
+/* status board */
+.board{background:var(--board);color:var(--board-ink);border-radius:16px;padding:20px 22px 16px;font-family:var(--mono);font-size:13.5px;box-shadow:0 30px 60px -30px rgba(10,30,90,.55)}
+.board-head{display:flex;justify-content:space-between;align-items:center;color:var(--board-muted);font-size:12px;padding-bottom:12px;border-bottom:1px solid #18223A;margin-bottom:6px}
+.dots{display:flex;gap:6px}.dots i{width:9px;height:9px;border-radius:50%;background:#1E2A44;display:block}
+.row{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:11px 0;border-bottom:1px dashed #18223A}
+.row:last-of-type{border-bottom:0}
+.pulse{width:9px;height:9px;border-radius:50%;background:#4C82FF;box-shadow:0 0 0 0 rgba(76,130,255,.6)}
+.pulse.amber{background:#FFFFFF;box-shadow:0 0 0 0 rgba(255,255,255,.6)}
+@media (prefers-reduced-motion:no-preference){
+  .pulse{animation:ping 2.4s infinite}
+  .row:nth-of-type(2) .pulse{animation-delay:.4s}.row:nth-of-type(3) .pulse{animation-delay:.8s}.row:nth-of-type(4) .pulse{animation-delay:1.2s}.row:nth-of-type(5) .pulse{animation-delay:1.6s}
+  .row{animation:rise .6s both}
+  .row:nth-of-type(2){animation-delay:.08s}.row:nth-of-type(3){animation-delay:.16s}.row:nth-of-type(4){animation-delay:.24s}.row:nth-of-type(5){animation-delay:.32s}.row:nth-of-type(6){animation-delay:.4s}
+}
+@keyframes ping{0%{box-shadow:0 0 0 0 rgba(76,130,255,.55)}70%{box-shadow:0 0 0 8px rgba(76,130,255,0)}100%{box-shadow:0 0 0 0 rgba(76,130,255,0)}}
+@keyframes rise{from{opacity:.35;transform:translateY(6px)}to{opacity:1;transform:none}}
+.row .name{color:#FFFFFF}
+.row .sub{color:var(--board-muted);font-size:12px;display:block}
+.tag{font-size:11px;padding:3px 8px;border-radius:5px;border:1px solid #22365F;color:#8FB3FF;letter-spacing:.04em}
+.tag.amber{border-color:#3A4A6B;color:#C9D8FF}
+.board-foot{margin-top:12px;padding-top:12px;border-top:1px solid #18223A;color:var(--board-muted);font-size:12px}
+.board-foot b{color:#4C82FF;font-weight:500}
+.caret{display:inline-block;width:7px;height:14px;background:#8FB3FF;vertical-align:-2px;margin-left:3px}
+@media (prefers-reduced-motion:no-preference){.caret{animation:blink 1.1s steps(2) infinite}}
+@keyframes blink{50%{opacity:0}}
+
+/* figures */
+.figures{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--surface)}
+.figures .wrap{display:grid;grid-template-columns:repeat(5,1fr)}
+.fig{padding:26px 18px 24px;border-left:1px solid var(--line)}
+.fig:first-child{border-left:0;padding-left:0}
+.fig .n{font-family:var(--display);font-weight:800;font-size:clamp(30px,3.4vw,42px);letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
+.fig .l{font-size:14px;color:var(--muted);margin-top:8px;line-height:1.4}
+@media (max-width:860px){.figures .wrap{grid-template-columns:repeat(2,1fr)}.fig{border-left:0;border-top:1px solid var(--line);padding-left:0}.fig:nth-child(-n+2){border-top:0}}
+
+/* sections */
+section{padding:clamp(64px,9vw,110px) 0 0}
+.sec-head{display:grid;grid-template-columns:200px 1fr;gap:24px;margin-bottom:40px;align-items:end}
+@media (max-width:760px){.sec-head{grid-template-columns:1fr;gap:8px}}
+.sec-label{font-family:var(--mono);font-size:13px;color:var(--accent);text-transform:uppercase;letter-spacing:.08em}
+.sec-head h2{font-size:clamp(28px,3.8vw,46px);font-weight:800;letter-spacing:-.03em}
+.sec-head p{grid-column:2;color:var(--muted);max-width:40em;margin-top:6px}
+@media (max-width:760px){.sec-head p{grid-column:1}}
+
+/* case files */
+.case{display:grid;grid-template-columns:200px 1fr;gap:24px;padding:40px 0;border-top:1px solid var(--line)}
+@media (max-width:760px){.case{grid-template-columns:1fr;gap:14px}}
+.case-meta{font-family:var(--mono);font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
+.case-meta .idx{font-size:13px;color:var(--accent)}
+.case-meta .st{display:inline-flex;align-items:center;gap:7px;color:var(--live)}
+.case-meta .st::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.case-meta .st.build{color:var(--accent)}
+.case-meta .st.past{color:var(--muted)}
+.case h3{font-size:clamp(24px,2.8vw,34px);font-weight:800;letter-spacing:-.025em}
+.case h3 span.kind{display:block;font-family:var(--body);font-size:16px;font-weight:500;letter-spacing:0;color:var(--muted);margin-top:8px}
+.case-body{display:grid;grid-template-columns:1.25fr 1fr;gap:28px 40px;margin-top:22px}
+@media (max-width:900px){.case-body{grid-template-columns:1fr}}
+.case-body p{max-width:38em}
+.case-body p + p{margin-top:12px}
+ul.hl{list-style:none;margin:0;padding:0;display:grid;gap:10px;font-size:15.5px}
+ul.hl li{padding-left:18px;position:relative}
+ul.hl li::before{content:"";position:absolute;left:0;top:.72em;width:8px;height:2px;background:var(--accent)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:18px}
+.chip{font-family:var(--mono);font-size:12px;padding:4px 9px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--muted)}
+.visit{display:inline-flex;gap:6px;margin-top:16px;font-family:var(--mono);font-size:13px;color:var(--ink);text-decoration:none;border-bottom:1px solid var(--accent);padding-bottom:2px}
+.visit:hover{color:var(--accent)}
+
+/* practice */
+.practice{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+@media (max-width:900px){.practice{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){.practice{grid-template-columns:1fr}}
+.pr{background:var(--surface);padding:26px 24px}
+.pr .k{font-family:var(--mono);font-size:12px;color:var(--accent)}
+.pr h3{font-size:18px;font-weight:600;letter-spacing:-.01em;margin:10px 0 8px;font-family:var(--display)}
+.pr p{font-size:15px;color:var(--muted)}
+
+/* skills */
+.skills{display:grid;grid-template-columns:repeat(2,1fr);gap:0 48px}
+@media (max-width:760px){.skills{grid-template-columns:1fr}}
+.sk{display:grid;grid-template-columns:150px 1fr;gap:16px;padding:18px 0;border-top:1px solid var(--line)}
+.sk h3{font-family:var(--body);font-size:15px;font-weight:600}
+.sk .chips{margin-top:0}
+
+/* side projects */
+.side{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+@media (max-width:900px){.side{grid-template-columns:1fr}}
+.card{border:1px solid var(--line);border-radius:14px;padding:24px;background:var(--surface);display:flex;flex-direction:column;gap:10px}
+.card .k{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.card h3{font-size:24px;font-weight:800;letter-spacing:-.02em}
+.card p{font-size:15px;color:var(--muted)}
+.card .chips{margin-top:auto;padding-top:8px}
+
+/* timeline */
+.tl{display:grid;gap:0}
+.tl-item{display:grid;grid-template-columns:200px 1fr;gap:24px;padding:28px 0;border-top:1px solid var(--line)}
+@media (max-width:760px){.tl-item{grid-template-columns:1fr;gap:6px}}
+.tl-when{font-family:var(--mono);font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.tl-item h3{font-size:20px;font-weight:600;letter-spacing:-.015em;font-family:var(--display)}
+.tl-item .org{color:var(--muted);margin:4px 0 12px;font-size:15px}
+.tl-item p{max-width:40em}
+
+/* contact */
+.contact{margin:clamp(72px,10vw,120px) 0 0;background:var(--board);color:var(--board-ink)}
+.contact .wrap{padding-top:clamp(56px,8vw,90px);padding-bottom:clamp(56px,8vw,90px);display:grid;grid-template-columns:1.2fr 1fr;gap:40px;align-items:end}
+@media (max-width:860px){.contact .wrap{grid-template-columns:1fr}}
+.contact h2{font-size:clamp(32px,4.8vw,58px);font-weight:800;letter-spacing:-.035em;color:#FFFFFF}
+.contact h2 em{font-style:normal;color:#4C82FF}
+.contact p.l{color:var(--board-muted);margin-top:16px;max-width:30em}
+.cl{list-style:none;margin:0;padding:0;font-family:var(--mono);font-size:15px}
+.cl li{display:grid;grid-template-columns:100px 1fr;gap:12px;padding:12px 0;border-top:1px solid #18223A}
+.cl li span{color:var(--board-muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em;padding-top:2px}
+.cl a{text-decoration:none;border-bottom:1px solid #2F4A80}
+.cl a:hover{color:#FFFFFF}
+.copy{all:unset;cursor:pointer;font-size:11px;color:#8FB3FF;margin-left:10px;border:1px solid #22365F;padding:2px 7px;border-radius:5px}
+footer{background:var(--board);color:var(--board-muted);font-family:var(--mono);font-size:12px;border-top:1px solid #18223A}
+footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;padding-top:18px;padding-bottom:22px}
+
+/* motion */
+.hero h1 em, .contact h2 em{background:linear-gradient(90deg,var(--accent),var(--accent-2),var(--accent));background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent}
+.contact h2 em{background-image:linear-gradient(90deg,#4C82FF,#9BBEFF,#4C82FF)}
+.hero{position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:-20% -10% auto auto;width:620px;height:620px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--accent) 22%,transparent),transparent 65%);pointer-events:none;z-index:0}
+.hero .wrap{position:relative;z-index:1}
+.grid-bg{position:absolute;inset:0;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:56px 56px;mask-image:radial-gradient(ellipse at 70% 30%,#000 10%,transparent 65%);-webkit-mask-image:radial-gradient(ellipse at 70% 30%,#000 10%,transparent 65%);opacity:.6;pointer-events:none}
+.board{transform-style:preserve-3d;will-change:transform}
+.case,.pr,.sk,.tl-item{position:relative}
+.pr{transition:background .25s}
+.pr:hover{background:color-mix(in srgb,var(--accent) 7%,var(--surface))}
+.chip{transition:border-color .2s,color .2s}
+.case:hover .chip{border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
+.case::after{content:"";position:absolute;left:0;top:-1px;height:2px;width:0;background:var(--accent)}
+.marquee{overflow:hidden;border-bottom:1px solid var(--line);background:var(--ink);color:var(--bg)}
+.marquee-track{display:flex;gap:48px;width:max-content;padding:14px 0;font-family:var(--mono);font-size:13px;letter-spacing:.06em;text-transform:uppercase}
+.marquee-track span::before{content:"\25C6";color:var(--accent);margin-right:48px}
+@media (prefers-reduced-motion:no-preference){
+  .hero h1 em,.contact h2 em{animation:shine 5s linear infinite}
+  .hero::before{animation:float 12s ease-in-out infinite alternate}
+  .w{display:inline-block;animation:wordUp .8s cubic-bezier(.2,.7,.2,1) both}
+  .eyebrow,.lede,.cta{animation:rise .8s .45s both}
+  .reveal{opacity:.2;transform:translateY(28px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
+  .reveal.in{opacity:1;transform:none}
+  .case::after{transition:width 1s cubic-bezier(.2,.7,.2,1)}
+  .case.in::after{width:100%}
+  .marquee-track{animation:scroll 38s linear infinite}
+  .marquee:hover .marquee-track{animation-play-state:paused}
+  .card,.btn{transition:transform .2s}
+}
+@keyframes shine{to{background-position:-200% 0}}
+@keyframes float{from{transform:translate(0,0)}to{transform:translate(-120px,80px)}}
+@keyframes wordUp{from{opacity:0;transform:translateY(.5em) rotate(2deg)}to{opacity:1;transform:none}}
+@keyframes scroll{to{transform:translateX(-50%)}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#top"><span class="mark">AH</span><span>Alcide Hinojosa</span></a>
+    <nav class="nav" aria-label="Sections">
+      <a href="#work"><span class="en">Work</span><span class="es">Proyectos</span></a>
+      <a href="#skills"><span class="en">Skills</span><span class="es">Habilidades</span></a>
+      <a href="#experience"><span class="en">Experience</span><span class="es">Experiencia</span></a>
+      <a href="#contact"><span class="en">Contact</span><span class="es">Contacto</span></a>
+      <div class="lang" role="group" aria-label="Language">
+        <button type="button" id="btn-en" aria-pressed="true">EN</button>
+        <button type="button" id="btn-es" aria-pressed="false">ES</button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+<!-- HERO -->
+<div class="hero">
+  <div class="grid-bg"></div>
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">
+        <span class="en">Computer Engineer</span><span class="es">Ingeniero Informático</span>
+        <span>·</span><span>Full-stack · DevOps · DBA</span><span>·</span><b>Guyana</b>
+      </div>
+      <h1>
+        <span class="en"><span class="w" style="animation-delay:0.00s">One</span> <span class="w" style="animation-delay:0.07s">engineer.</span> <span class="w" style="animation-delay:0.14s"><em>Five systems</em></span> <span class="w" style="animation-delay:0.21s">in</span> <span class="w" style="animation-delay:0.28s">production.</span></span>
+        <span class="es"><span class="w" style="animation-delay:0.00s">Un</span> <span class="w" style="animation-delay:0.07s">ingeniero.</span> <span class="w" style="animation-delay:0.14s"><em>Cinco sistemas</em></span> <span class="w" style="animation-delay:0.21s">en</span> <span class="w" style="animation-delay:0.28s">producción.</span></span>
+      </h1>
+      <p class="lede en">I design, build, deploy and support business software end to end. At Marathon Development Group I am the <strong>sole developer and IT administrator</strong> behind the payroll, delivery, field-services and client-portal platforms that a group of companies in Guyana runs on every day.</p>
+      <p class="lede es">Diseño, construyo, despliego y doy soporte a software empresarial de principio a fin. En Marathon Development Group soy el <strong>único desarrollador y administrador de TI</strong> detrás de las plataformas de nómina, entregas, servicios de campo y portal de clientes con las que opera a diario un grupo de empresas en Guyana.</p>
+      <div class="cta">
+        <a class="btn primary" href="#work"><span class="en">See the work</span><span class="es">Ver proyectos</span> →</a>
+        <a class="btn" href="#contact"><span class="en">Get in touch</span><span class="es">Contactar</span></a>
+      </div>
+    </div>
+
+    <div class="board" aria-label="Production systems status">
+      <div class="board-head"><div class="dots"><i></i><i></i><i></i></div><span>~/production — status</span></div>
+      <div class="row"><span class="pulse"></span><span><span class="name">Nomina</span><span class="sub"><span class="en">payroll + HRM · 6 companies</span><span class="es">nómina + RR.HH. · 6 empresas</span></span></span><span class="tag">LIVE</span></div>
+      <div class="row"><span class="pulse"></span><span><span class="name">zippysgy.com</span><span class="sub"><span class="en">delivery ops · web + Android</span><span class="es">logística · web + Android</span></span></span><span class="tag">LIVE</span></div>
+      <div class="row"><span class="pulse"></span><span><span class="name">livitygy.com/portal</span><span class="sub"><span class="en">field services · 17 modules</span><span class="es">servicios de campo · 17 módulos</span></span></span><span class="tag">LIVE</span></div>
+      <div class="row"><span class="pulse amber"></span><span><span class="name">client.mayers-associates.com</span><span class="sub"><span class="en">client portal · phased delivery</span><span class="es">portal de clientes · por fases</span></span></span><span class="tag amber">SHIPPING</span></div>
+      <div class="row"><span class="pulse"></span><span><span class="name">site.carib-zoom.com</span><span class="sub"><span class="en">e-commerce site · admin</span><span class="es">sitio e-commerce · admin</span></span></span><span class="tag">MAINTAINED</span></div>
+      <div class="board-foot">$ git push &amp;&amp; vercel --prod <span class="caret"></span><br><b>1</b> <span class="en">engineer on call · since March 2026</span><span class="es">ingeniero de guardia · desde marzo 2026</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- FIGURES -->
+<div class="figures">
+  <div class="wrap">
+    <div class="fig reveal"><div class="n" data-count="4">4</div><div class="l"><span class="en">production platforms built in under 8 months</span><span class="es">plataformas en producción construidas en menos de 8 meses</span></div></div>
+    <div class="fig reveal"><div class="n" data-count="6">6</div><div class="l"><span class="en">companies paid through one payroll engine</span><span class="es">empresas pagadas con un mismo motor de nómina</span></div></div>
+    <div class="fig reveal"><div class="n" data-count="17">17</div><div class="l"><span class="en">modules delivered from a formal SRS</span><span class="es">módulos entregados a partir de un SRS formal</span></div></div>
+    <div class="fig reveal"><div class="n" data-count="10" data-suffix="+">10+</div><div class="l"><span class="en">official GRA / NIS forms generated automatically</span><span class="es">formularios oficiales GRA / NIS generados automáticamente</span></div></div>
+    <div class="fig reveal"><div class="n">~3×</div><div class="l"><span class="en">smaller driver-app download after code-splitting</span><span class="es">menos descarga en la app de choferes tras code-splitting</span></div></div>
+  </div>
+</div>
+
+<div class="marquee" aria-hidden="true"><div class="marquee-track"><span>Next.js</span><span>React</span><span>TypeScript</span><span>PostgreSQL</span><span>Supabase</span><span>Row-Level Security</span><span>Node.js</span><span>Vercel</span><span>Edge Functions</span><span>QuickBooks OAuth</span><span>MMG Checkout</span><span>Meta Graph API</span><span>Capacitor · Android</span><span>Resend</span><span>n8n</span><span>DNS · DKIM · SPF</span><span>Next.js</span><span>React</span><span>TypeScript</span><span>PostgreSQL</span><span>Supabase</span><span>Row-Level Security</span><span>Node.js</span><span>Vercel</span><span>Edge Functions</span><span>QuickBooks OAuth</span><span>MMG Checkout</span><span>Meta Graph API</span><span>Capacitor · Android</span><span>Resend</span><span>n8n</span><span>DNS · DKIM · SPF</span></div></div>
+
+<!-- WORK -->
+<section id="work">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-label"><span class="en">Selected work</span><span class="es">Proyectos</span></div>
+      <h2><span class="en">Systems businesses depend on</span><span class="es">Sistemas de los que dependen las empresas</span></h2>
+      <p class="en">Each of these was built from requirements gathered directly with the business, shipped to production, and is supported by me day to day: user requests, bug fixes, data, DNS, deployments.</p>
+      <p class="es">Cada uno se construyó a partir de requisitos levantados directamente con el negocio, salió a producción y lo soporto yo en el día a día: solicitudes de usuarios, errores, datos, DNS y despliegues.</p>
+    </div>
+
+    <!-- Nomina -->
+    <article class="case reveal">
+      <div class="case-meta"><span class="idx">01</span><span class="st">Live</span><span>Next.js · Supabase</span></div>
+      <div>
+        <h3>Nomina<span class="kind"><span class="en">Payroll &amp; HR management for a multi-company group</span><span class="es">Nómina y gestión de RR.HH. para un grupo de empresas</span></span></h3>
+        <div class="case-body">
+          <div>
+            <p class="en">Payroll in Guyana means company-specific working days, overtime, Sunday double pay, PAYE bands, NIS and a stack of statutory forms filed by hand. I replaced that with one system that calculates pay for six companies and produces the government paperwork from the same data.</p>
+            <p class="es">La nómina en Guyana implica días laborables por empresa, horas extra, doble pago en domingo, tramos PAYE, NIS y un montón de formularios estatales hechos a mano. Lo reemplacé con un sistema que calcula el pago de seis empresas y genera la documentación oficial desde los mismos datos.</p>
+            <p class="en">Planned and delivered in ten phases, from the payroll engine to a self-service employee portal, with an approval workflow that ends at the CEO.</p>
+            <p class="es">Planificado y entregado en diez fases, desde el motor de cálculo hasta un portal de autoservicio para empleados, con un flujo de aprobación que termina en el CEO.</p>
+            <div class="chips"><span class="chip">Next.js</span><span class="chip">PostgreSQL</span><span class="chip">Supabase RLS</span><span class="chip">SQL triggers</span><span class="chip">ExcelJS</span><span class="chip">react-pdf</span><span class="chip">Vercel</span></div>
+          </div>
+          <ul class="hl en">
+            <li>Statutory suite: GRA Forms 5, 2A, 2B and 7B, NIS electronic schedule and B700F1, generated as Excel and PDF from official templates</li>
+            <li>Bank transfer files with a sort-code table rebuilt from official documents, plus bank letters on each company's letterhead</li>
+            <li>Loans and advances with approval, automatic instalment deduction and a fix for a real double-deduction bug</li>
+            <li>Leave rules by category and tenure, HR letters, transfers, assets, child tax allowance, termination flow</li>
+            <li>Audit log written by database triggers, independent of application code</li>
+          </ul>
+          <ul class="hl es">
+            <li>Suite estatal: Formularios GRA 5, 2A, 2B y 7B, planilla electrónica NIS y B700F1, generados en Excel y PDF desde plantillas oficiales</li>
+            <li>Archivos de transferencia bancaria con tabla de códigos reconstruida de documentos oficiales, y cartas al banco con el membrete de cada empresa</li>
+            <li>Préstamos y adelantos con aprobación, descuento automático de cuotas y corrección de un error real de doble descuento</li>
+            <li>Reglas de vacaciones por categoría y antigüedad, cartas de RR.HH., traslados, activos, deducción por hijos, flujo de baja</li>
+            <li>Registro de auditoría escrito por triggers de base de datos, independiente del código de la app</li>
+          </ul>
+        </div>
+      </div>
+    </article>
+
+    <!-- Zippy's -->
+    <article class="case reveal">
+      <div class="case-meta"><span class="idx">02</span><span class="st">Live</span><span>React · Vite · Supabase</span></div>
+      <div>
+        <h3>Zippy's<span class="kind"><span class="en">Delivery &amp; logistics platform with an Android app</span><span class="es">Plataforma de entregas y logística con app Android</span></span></h3>
+        <div class="case-body">
+          <div>
+            <p class="en">Zippy's runs a courier operation across Guyana's regions. I built the platform from the ground up: four role-based dashboards (admin, staff, driver, partner), a public website with guest booking, and an Android app the drivers use in the field.</p>
+            <p class="es">Zippy's opera una mensajería por las regiones de Guyana. Construí la plataforma desde cero: cuatro paneles por rol (admin, staff, chofer, socio), un sitio público con reservas sin cuenta y una app Android que usan los choferes en la calle.</p>
+            <p class="en">When drivers on weak rural signal could not load the app, I traced it to bundle size rather than old devices, and cut the driver download by about three times with code-splitting.</p>
+            <p class="es">Cuando los choferes con poca señal en zonas rurales no podían cargar la app, encontré que la causa era el tamaño del bundle y no los equipos viejos, y reduje la descarga unas tres veces con code-splitting.</p>
+            <div class="chips"><span class="chip">React</span><span class="chip">Vite</span><span class="chip">Supabase Realtime</span><span class="chip">Edge Functions</span><span class="chip">pg_cron</span><span class="chip">Capacitor</span><span class="chip">Android Studio</span><span class="chip">Resend</span></div>
+            <a class="visit" href="https://zippysgy.com">zippysgy.com ↗</a>
+          </div>
+          <ul class="hl en">
+            <li>Versioned partner rate system: standardized zones, rate history with effective dates, never overwritten</li>
+            <li>Proof-of-delivery photos, mileage and fuel logs, incidents, earnings and end-of-day mileage checks</li>
+            <li>Financial reporting by date range, fleet service alerts, airport pickups, rentals and truck logistics</li>
+            <li>Grouped email notifications: queue table, triggers and a scheduled Edge Function</li>
+            <li>Fixed an auth race condition in supabase-js that made dropdowns go blank at random</li>
+            <li>Migrated the domain off Squarespace without touching the company's Google Workspace mail</li>
+          </ul>
+          <ul class="hl es">
+            <li>Sistema de tarifas versionado por socio: zonas estandarizadas e historial con fechas de vigencia que nunca se sobrescribe</li>
+            <li>Fotos de prueba de entrega, registro de millaje y combustible, incidentes, ganancias y cierre diario de millaje</li>
+            <li>Reportes financieros por rango de fechas, alertas de mantenimiento de flota, recogidas en aeropuerto, alquileres y logística</li>
+            <li>Notificaciones por correo agrupadas: tabla de cola, triggers y Edge Function programada</li>
+            <li>Corregí una condición de carrera de autenticación en supabase-js que vaciaba los desplegables al azar</li>
+            <li>Migré el dominio fuera de Squarespace sin afectar el correo de Google Workspace de la empresa</li>
+          </ul>
+        </div>
+      </div>
+    </article>
+
+    <!-- Livity -->
+    <article class="case reveal">
+      <div class="case-meta"><span class="idx">03</span><span class="st">Live</span><span>Next.js · Supabase</span></div>
+      <div>
+        <h3>Livity Projects<span class="kind"><span class="en">Operations portal for a professional cleaning company</span><span class="es">Portal operativo para una empresa de limpieza profesional</span></span></h3>
+        <div class="case-body">
+          <div>
+            <p class="en">Livity's owner handed me a formal Software Requirements Specification. I delivered 17 modules from it, covering the whole job lifecycle: enquiry, quotation, work order, dispatch, time tracking, quality inspection, customer sign-off, invoice, payment and accounting export.</p>
+            <p class="es">El dueño de Livity me entregó una Especificación de Requisitos de Software formal. Entregué 17 módulos a partir de ella, cubriendo todo el ciclo de un trabajo: consulta, cotización, orden de trabajo, despacho, control de tiempo, inspección de calidad, firma del cliente, factura, pago y exportación contable.</p>
+            <p class="en">When the company's DigitalOcean account was suspended, I migrated the public site and its integrations to Next.js on Vercel and kept the business taking bookings.</p>
+            <p class="es">Cuando suspendieron la cuenta de DigitalOcean de la empresa, migré el sitio público y sus integraciones a Next.js en Vercel y el negocio siguió recibiendo reservas.</p>
+            <div class="chips"><span class="chip">Next.js API routes</span><span class="chip">MMG Checkout</span><span class="chip">QuickBooks OAuth</span><span class="chip">Resend</span><span class="chip">Supabase Auth</span><span class="chip">Vercel</span></div>
+            <a class="visit" href="https://livitygy.com">livitygy.com ↗</a>
+          </div>
+          <ul class="hl en">
+            <li>MMG mobile-money payments in production; diagnosed a live payment shown as failed by decrypting the real gateway token</li>
+            <li>QuickBooks Online integration with OAuth and an in-portal export flow</li>
+            <li>Recurring billing: monthly invoice batches, visit scheduling and cancellation credits</li>
+            <li>Loyalty and referral coupon engine with event log and daily scheduled job</li>
+            <li>Staff deactivation that truly blocks login, and a fix for customer data exposed on a public endpoint</li>
+          </ul>
+          <ul class="hl es">
+            <li>Pagos con MMG en producción; diagnostiqué un pago real que aparecía como fallido descifrando el token del gateway</li>
+            <li>Integración con QuickBooks Online vía OAuth y flujo de exportación dentro del portal</li>
+            <li>Facturación recurrente: lotes mensuales de facturas, programación de visitas y créditos por cancelación</li>
+            <li>Motor de cupones de lealtad y referidos con registro de eventos y tarea diaria programada</li>
+            <li>Desactivación de personal que bloquea el acceso de verdad, y corrección de datos de clientes expuestos en un endpoint público</li>
+          </ul>
+        </div>
+      </div>
+    </article>
+
+    <!-- MDA -->
+    <article class="case reveal">
+      <div class="case-meta"><span class="idx">04</span><span class="st build"><span class="en">Shipping in phases</span><span class="es">Entrega por fases</span></span><span>Next.js 16 · TypeScript</span></div>
+      <div>
+        <h3>MDA Digital Practice Platform<span class="kind"><span class="en">Client portal for an accounting, tax &amp; advisory firm</span><span class="es">Portal de clientes para una firma de contabilidad, impuestos y asesoría</span></span></h3>
+        <div class="case-body">
+          <div>
+            <p class="en">Scoped from a six-phase SRS. I committed to a 12-month plan for the core (website, client portal, client master record, legacy migration, payments, compliance and reporting) and report progress to the client each month with what was built and why it matters.</p>
+            <p class="es">Definido a partir de un SRS de seis fases. Me comprometí a un plan de 12 meses para el núcleo (sitio web, portal de clientes, registro maestro, migración de datos, pagos, cumplimiento y reportes) y reporto el avance cada mes con lo construido y su valor para el negocio.</p>
+            <p class="en">Production runs on accounts owned by the client, so the firm keeps full control of its data and hosting.</p>
+            <p class="es">Producción corre en cuentas a nombre del cliente, para que la firma mantenga el control total de sus datos y su hosting.</p>
+            <div class="chips"><span class="chip">Next.js 16</span><span class="chip">TypeScript</span><span class="chip">Tailwind v4</span><span class="chip">Supabase Storage</span><span class="chip">RBAC</span><span class="chip">Resend SMTP</span><span class="chip">DNS · DKIM · SPF</span></div>
+            <a class="visit" href="https://client.mayers-associates.com">client.mayers-associates.com ↗</a>
+          </div>
+          <ul class="hl en">
+            <li>Role-based access with configurable staff sub-roles, managed from the UI instead of SQL</li>
+            <li>Private document vault with signed URLs and validated uploads</li>
+            <li>Service requests with numbering, document checklists, status tracking and staff work queues</li>
+            <li>Audit log, privacy-policy consent with timestamp, and a live service catalogue driven by the database</li>
+            <li>Security fixes found through my own edge-case testing, such as blocking self-demotion of the last manager</li>
+          </ul>
+          <ul class="hl es">
+            <li>Acceso por roles con subroles de personal configurables desde la interfaz, no por SQL</li>
+            <li>Bóveda privada de documentos con URLs firmadas y subidas validadas</li>
+            <li>Solicitudes de servicio con numeración, listas de documentos, estados y colas de trabajo del personal</li>
+            <li>Registro de auditoría, aceptación de política de privacidad con fecha y catálogo de servicios en vivo desde la base de datos</li>
+            <li>Correcciones de seguridad halladas en mis propias pruebas de casos límite, como impedir que un gerente se quite su propio acceso</li>
+          </ul>
+        </div>
+      </div>
+    </article>
+
+    <!-- Carib-Zoom -->
+    <article class="case reveal">
+      <div class="case-meta"><span class="idx">05</span><span class="st past"><span class="en">Delivered · now maintained</span><span class="es">Entregado · en mantenimiento</span></span><span>React · Node · n8n</span></div>
+      <div>
+        <h3>Carib-Zoom<span class="kind"><span class="en">E-commerce and a unified social inbox</span><span class="es">E-commerce y bandeja unificada de redes sociales</span></span></h3>
+        <div class="case-body">
+          <div>
+            <p class="en">For the group's retail brand I built a React storefront with a drag-and-drop banner editor and hierarchical categories, and a dashboard where the sales team answers Facebook Messenger and Instagram messages for several brands in one place, with attendance tracking.</p>
+            <p class="es">Para la marca de retail del grupo construí una tienda en React con editor de banners arrastrable y categorías jerárquicas, y un panel donde el equipo de ventas responde los mensajes de Messenger e Instagram de varias marcas en un solo lugar, con control de asistencia.</p>
+            <p class="en">Today I administer the company's WordPress store and its move to MDG hosting.</p>
+            <p class="es">Hoy administro la tienda WordPress de la empresa y su traslado al hosting de MDG.</p>
+            <div class="chips"><span class="chip">React</span><span class="chip">Node.js</span><span class="chip">Meta Graph API</span><span class="chip">Webhooks</span><span class="chip">n8n</span><span class="chip">WordPress · Elementor</span></div>
+          </div>
+          <ul class="hl en">
+            <li>Messenger and Instagram webhooks wired through n8n, with replies sent back through the Graph API</li>
+            <li>Multi-brand routing by page, delete and resend flows, team status view</li>
+            <li>Storefront with inline-editable hero slider and canvas banner editor</li>
+          </ul>
+          <ul class="hl es">
+            <li>Webhooks de Messenger e Instagram conectados con n8n, y respuestas enviadas por la Graph API</li>
+            <li>Enrutamiento por marca según la página, flujos de borrado y reenvío, vista de estado del equipo</li>
+            <li>Tienda con slider editable en línea y editor de banners tipo canvas</li>
+          </ul>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- PRACTICE -->
+<section id="practice">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-label"><span class="en">How I work</span><span class="es">Cómo trabajo</span></div>
+      <h2><span class="en">The whole team's job, done carefully</span><span class="es">El trabajo de un equipo, hecho con cuidado</span></h2>
+      <p class="en">With no one else on the technical side, every role is mine. These are the habits that keep five systems stable.</p>
+      <p class="es">Sin nadie más en la parte técnica, todos los roles son míos. Estos son los hábitos que mantienen estables cinco sistemas.</p>
+    </div>
+    <div class="practice">
+      <div class="pr reveal"><div class="k">01 · <span class="en">requirements</span><span class="es">requisitos</span></div><h3><span class="en">From SRS to shipped</span><span class="es">Del SRS a producción</span></h3><p class="en">I read formal specs, turn them into phased plans with honest timelines, and confirm business rules with the people who own them before writing code.</p><p class="es">Leo especificaciones formales, las convierto en planes por fases con plazos realistas y confirmo las reglas de negocio con sus dueños antes de programar.</p></div>
+      <div class="pr reveal"><div class="k">02 · <span class="en">security</span><span class="es">seguridad</span></div><h3><span class="en">Data protected at the database</span><span class="es">Datos protegidos en la base</span></h3><p class="en">Row-level security on every table, server-side checks, signed URLs, login bans that actually block access. I audit and fix the gaps I find.</p><p class="es">Seguridad a nivel de fila en cada tabla, validación en servidor, URLs firmadas y bloqueos de acceso reales. Audito y corrijo los huecos que encuentro.</p></div>
+      <div class="pr reveal"><div class="k">03 · <span class="en">integrations</span><span class="es">integraciones</span></div><h3><span class="en">Money and messages</span><span class="es">Pagos y mensajes</span></h3><p class="en">MMG mobile money, QuickBooks OAuth, Meta Graph API, Resend transactional email, Excel and PDF generation from official templates.</p><p class="es">Pagos móviles MMG, OAuth de QuickBooks, Meta Graph API, correo transaccional con Resend, Excel y PDF desde plantillas oficiales.</p></div>
+      <div class="pr reveal"><div class="k">04 · <span class="en">operations</span><span class="es">operaciones</span></div><h3><span class="en">Deploys, DNS and uptime</span><span class="es">Despliegues, DNS y disponibilidad</span></h3><p class="en">Git-based deploys on Vercel, custom domains, DKIM/SPF/DMARC, scheduled jobs and keep-alive tasks, migrations off failing hosts.</p><p class="es">Despliegues con Git en Vercel, dominios propios, DKIM/SPF/DMARC, tareas programadas y keep-alive, migraciones desde hostings caídos.</p></div>
+      <div class="pr reveal"><div class="k">05 · <span class="en">diagnosis</span><span class="es">diagnóstico</span></div><h3><span class="en">Root cause, not guesses</span><span class="es">Causa raíz, no suposiciones</span></h3><p class="en">Race conditions, silent RLS failures, payload limits, case-sensitive gateway fields: I reproduce, prove the cause, then fix it once.</p><p class="es">Condiciones de carrera, fallos silenciosos de RLS, límites de payload, campos sensibles a mayúsculas: reproduzco, demuestro la causa y lo arreglo una vez.</p></div>
+      <div class="pr reveal"><div class="k">06 · <span class="en">communication</span><span class="es">comunicación</span></div><h3><span class="en">Written for the business</span><span class="es">Escrito para el negocio</span></h3><p class="en">Architecture documents per platform, monthly progress reports, bilingual user guides, and plain answers to daily requests from staff and directors.</p><p class="es">Documentos de arquitectura por plataforma, reportes mensuales de avance, guías de usuario bilingües y respuestas claras a las solicitudes diarias del personal y la dirección.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-label"><span class="en">Skills</span><span class="es">Habilidades</span></div>
+      <h2><span class="en">Tools I use in production</span><span class="es">Herramientas que uso en producción</span></h2>
+    </div>
+    <div class="skills">
+      <div class="sk reveal"><h3><span class="en">Languages</span><span class="es">Lenguajes</span></h3><div class="chips"><span class="chip">JavaScript</span><span class="chip">TypeScript</span><span class="chip">SQL</span><span class="chip">Python</span><span class="chip">Java</span><span class="chip">C++</span><span class="chip">HTML · CSS</span></div></div>
+      <div class="sk reveal"><h3>Frontend</h3><div class="chips"><span class="chip">React</span><span class="chip">Next.js (App Router)</span><span class="chip">Vite</span><span class="chip">Tailwind CSS</span><span class="chip">Responsive UI</span></div></div>
+      <div class="sk reveal"><h3>Backend</h3><div class="chips"><span class="chip">Node.js</span><span class="chip">Next.js API routes</span><span class="chip">Server Actions</span><span class="chip">Edge Functions</span><span class="chip">REST</span><span class="chip">Webhooks</span></div></div>
+      <div class="sk reveal"><h3><span class="en">Data</span><span class="es">Datos</span></h3><div class="chips"><span class="chip">PostgreSQL</span><span class="chip">Supabase</span><span class="chip">Row-Level Security</span><span class="chip">Triggers</span><span class="chip">pg_cron</span><span class="chip">MySQL</span><span class="chip">SQLite</span></div></div>
+      <div class="sk reveal"><h3><span class="en">Integrations</span><span class="es">Integraciones</span></h3><div class="chips"><span class="chip">OAuth 2.0</span><span class="chip">QuickBooks API</span><span class="chip">MMG Checkout</span><span class="chip">Meta Graph API</span><span class="chip">Resend</span><span class="chip">n8n</span></div></div>
+      <div class="sk reveal"><h3>DevOps</h3><div class="chips"><span class="chip">Git · GitHub</span><span class="chip">Vercel</span><span class="chip">DNS</span><span class="chip">Docker</span><span class="chip">DigitalOcean</span><span class="chip">PowerShell</span></div></div>
+      <div class="sk reveal"><h3>Mobile</h3><div class="chips"><span class="chip">Capacitor</span><span class="chip">Android Studio</span><span class="chip">APK builds</span><span class="chip"><span class="en">Performance tuning</span><span class="es">Optimización</span></span></div></div>
+      <div class="sk reveal"><h3><span class="en">Documents</span><span class="es">Documentos</span></h3><div class="chips"><span class="chip">ExcelJS</span><span class="chip">react-pdf</span><span class="chip"><span class="en">Official form templates</span><span class="es">Plantillas oficiales</span></span><span class="chip"><span class="en">Letterheads</span><span class="es">Membretes</span></span></div></div>
+      <div class="sk reveal"><h3><span class="en">Quality</span><span class="es">Calidad</span></h3><div class="chips"><span class="chip"><span class="en">Edge-case testing</span><span class="es">Pruebas de casos límite</span></span><span class="chip"><span class="en">Bug reporting</span><span class="es">Reporte de errores</span></span><span class="chip">UAT</span><span class="chip">DevTools</span></div></div>
+      <div class="sk reveal"><h3><span class="en">AI-assisted dev</span><span class="es">Desarrollo con IA</span></h3><div class="chips"><span class="chip"><span class="en">Prompting for code</span><span class="es">Prompts para código</span></span><span class="chip"><span class="en">Review &amp; verification</span><span class="es">Revisión y verificación</span></span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-label"><span class="en">Experience</span><span class="es">Experiencia</span></div>
+      <h2><span class="en">Where I've worked and studied</span><span class="es">Dónde he trabajado y estudiado</span></h2>
+    </div>
+    <div class="tl">
+      <div class="tl-item reveal">
+        <div class="tl-when"><span class="en">Mar 2026 — present</span><span class="es">mar 2026 — actualidad</span></div>
+        <div>
+          <h3><span class="en">Software Engineer · Sole Developer &amp; IT Administrator</span><span class="es">Ingeniero de Software · Único desarrollador y administrador de TI</span></h3>
+          <div class="org">Marathon Development Group (Zippy's Inc.) · Guyana</div>
+          <p class="en">Full-stack development, DevOps, database administration and stakeholder support for Nomina, Zippy's, Livity Projects, the MDA client portal and the Carib-Zoom site. I take requests directly from the CEO, directors and operations staff and own each platform from database to domain.</p>
+          <p class="es">Desarrollo full-stack, DevOps, administración de bases de datos y soporte a usuarios para Nomina, Zippy's, Livity Projects, el portal de clientes de MDA y el sitio de Carib-Zoom. Recibo solicitudes directamente del CEO, directores y personal de operaciones y me encargo de cada plataforma, de la base de datos al dominio.</p>
+        </div>
+      </div>
+      <div class="tl-item reveal">
+        <div class="tl-when"><span class="en">Feb 2023 — Jan 2026</span><span class="es">feb 2023 — ene 2026</span></div>
+        <div>
+          <h3><span class="en">Computer Engineer</span><span class="es">Ingeniero Informático</span></h3>
+          <div class="org"><span class="en">ETECSA, Cuban Telecommunications Company · Havana</span><span class="es">ETECSA, Empresa de Telecomunicaciones de Cuba · La Habana</span></div>
+          <p class="en">Analyzed internal workflows and built three tools that are still in use: report automation that cut report generation from hours to minutes, and an incident management system that shortened resolution cycles by 40%. The work was presented and recognized at the company's Science and Technology Forum.</p>
+          <p class="es">Analicé flujos internos y construí tres herramientas que siguen en uso: automatización de reportes que redujo su generación de horas a minutos, y un sistema de gestión de incidencias que acortó los ciclos de resolución un 40%. El trabajo se presentó y fue reconocido en el Fórum de Ciencia y Técnica de la empresa.</p>
+        </div>
+      </div>
+      <div class="tl-item reveal">
+        <div class="tl-when"><span class="en">Graduated 2023</span><span class="es">Graduado 2023</span></div>
+        <div>
+          <h3><span class="en">B.Eng. Computer Engineering</span><span class="es">Ingeniería en Ciencias Informáticas</span></h3>
+          <div class="org"><span class="en">University of Informatics Sciences (UCI) · Havana, Cuba</span><span class="es">Universidad de las Ciencias Informáticas (UCI) · La Habana, Cuba</span></div>
+          <p class="en">Software engineering, systems architecture, applied mathematics and programming paradigms.</p>
+          <p class="es">Ingeniería de software, arquitectura de sistemas, matemática aplicada y paradigmas de programación.</p>
+        </div>
+      </div>
+      <div class="tl-item reveal">
+        <div class="tl-when"><span class="en">Languages</span><span class="es">Idiomas</span></div>
+        <div>
+          <h3><span class="en">Spanish · English</span><span class="es">Español · Inglés</span></h3>
+          <p class="en">Spanish is my native language. I work in English every day with directors, staff and clients, and I am studying daily to reach full fluency.</p>
+          <p class="es">El español es mi lengua materna. Trabajo en inglés a diario con directores, personal y clientes, y estudio cada día para alcanzar fluidez completa.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- CONTACT -->
+<section class="contact" id="contact">
+  <div class="wrap">
+    <div>
+      <h2><span class="en">Need someone who can <em>own the whole stack?</em></span><span class="es">¿Buscas a alguien que se haga cargo <em>de todo el stack?</em></span></h2>
+      <p class="l en">Open to full-time roles, remote or in Guyana, and to project work. I reply in English or Spanish.</p>
+      <p class="l es">Disponible para puestos a tiempo completo, remotos o en Guyana, y para proyectos. Respondo en español o inglés.</p>
+    </div>
+    <ul class="cl">
+      <li><span>Email</span><div><a href="mailto:alcidehinojosa@gmail.com">alcidehinojosa@gmail.com</a><button class="copy" type="button" data-copy="alcidehinojosa@gmail.com"><span class="en">copy</span><span class="es">copiar</span></button></div></li>
+      <li><span>WhatsApp</span><div><a href="https://wa.me/5926941983">+592 694 1983</a></div></li>
+      <li><span>GitHub</span><div><a href="https://github.com/Hinojosa12">github.com/Hinojosa12</a></div></li>
+      <li><span><span class="en">Based in</span><span class="es">Ubicación</span></span><div>Essequibo, Guyana · GMT−4</div></li>
+    </ul>
+  </div>
+</section>
+<footer><div class="wrap"><span>Alcide Humberto Hinojosa Caballero</span><span><span class="en">Computer Engineer · UCI 2023</span><span class="es">Ingeniero Informático · UCI 2023</span></span></div></footer>
+
+<script>
+(function(){
+  var root=document.documentElement, en=document.getElementById('btn-en'), es=document.getElementById('btn-es');
+  function set(l){
+    root.setAttribute('data-lang',l); root.lang=l;
+    en.setAttribute('aria-pressed', l==='en'); es.setAttribute('aria-pressed', l==='es');
+    try{localStorage.setItem('ah-lang',l)}catch(e){}
+  }
+  var saved=null; try{saved=localStorage.getItem('ah-lang')}catch(e){}
+  if(saved==='es'||saved==='en') set(saved);
+  en.addEventListener('click',function(){set('en')});
+  es.addEventListener('click',function(){set('es')});
+  document.querySelectorAll('.copy').forEach(function(b){
+    b.addEventListener('click',function(){
+      var t=b.getAttribute('data-copy'), orig=b.innerHTML;
+      var done=function(){b.textContent=root.dataset.lang==='es'?'copiado':'copied';setTimeout(function(){b.innerHTML=orig},1500)};
+      try{navigator.clipboard.writeText(t).then(done,function(){})}catch(e){}
+    });
+  });
+
+  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var els=document.querySelectorAll('.reveal');
+  if(!reduce&&'IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){
+      var el=e.target, sib=el.parentNode?Array.prototype.indexOf.call(el.parentNode.children,el):0;
+      el.style.transitionDelay=Math.min(sib,6)*70+'ms'; el.classList.add('in');
+      var n=el.querySelector('[data-count]'); if(n) count(n);
+      io.unobserve(el);}})},{threshold:.12,rootMargin:'0px 0px -40px 0px'});
+    els.forEach(function(el){io.observe(el)});
+  } else { els.forEach(function(el){el.classList.add('in')}); }
+  function count(n){var to=+n.dataset.count,suf=n.dataset.suffix||'',t0=null;
+    function step(t){if(!t0)t0=t;var p=Math.min((t-t0)/1100,1),v=Math.round(to*(1-Math.pow(1-p,3)));n.textContent=v+suf;if(p<1)requestAnimationFrame(step)}
+    requestAnimationFrame(step)}
+  var board=document.querySelector('.board');
+  if(board&&!reduce&&matchMedia('(pointer:fine)').matches){
+    board.parentNode.addEventListener('mousemove',function(e){var r=board.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;
+      board.style.transform='perspective(900px) rotateY('+(x*8)+'deg) rotateX('+(-y*8)+'deg)'});
+    board.parentNode.addEventListener('mouseleave',function(){board.style.transform=''});
+    board.style.transition='transform .2s ease-out';
+  }
+
+  function ease(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2}
+  document.querySelectorAll('a[href^="#"]').forEach(function(a){
+    a.addEventListener('click',function(e){
+      var id=a.getAttribute('href').slice(1), t=id==='top'?document.body:document.getElementById(id);
+      if(!t) return; e.preventDefault();
+      var start=window.scrollY, end=id==='top'?0:t.getBoundingClientRect().top+start-72, d=end-start;
+      if(reduce){window.scrollTo(0,end);return}
+      var dur=Math.min(1400,Math.max(650,Math.abs(d)*.45)), t0=null;
+      function step(ts){if(!t0)t0=ts;var p=Math.min((ts-t0)/dur,1);window.scrollTo(0,start+d*ease(p));if(p<1)requestAnimationFrame(step)}
+      requestAnimationFrame(step);
+    });
+  });
+})();
+</script>
+</body>
+</html>
